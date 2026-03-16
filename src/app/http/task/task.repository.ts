@@ -45,7 +45,6 @@ export default class TaskRepository {
   }
 
   async update(
-    id: number,
     userId: number,
     task: ITask.UpdateTask,
   ): Promise<ITask.ResponseTask | null> {
@@ -55,7 +54,7 @@ export default class TaskRepository {
             description = COALESCE($2, description)
         WHERE id = $3 AND user_id = $4
         RETURNING id, title, description, user_id`,
-      [task.title, task.description, id, userId],
+      [task.title, task.description, task.id, userId],
     );
     return result.rows[0] || null;
   }

@@ -12,6 +12,7 @@ declare namespace ITask {
   }
 
   interface UpdateTask {
+    id: number;
     title?: string;
     description?: string;
   }

@@ -21,10 +21,10 @@ export default class UserRepository {
 
   async create(user: IUser.CreateUser): Promise<IUser.ResponseUser> {
     const result = await query(
-      `INSERT INTO users(name, username) 
-      VALUES ($1, $2) 
+      `INSERT INTO users(name, username, password) 
+      VALUES ($1, $2, $3) 
       RETURNING id, name, username`,
-      [user.name, user.username],
+      [user.name, user.username, user.password],
     );
 
     return result.rows[0];
@@ -37,9 +37,11 @@ export default class UserRepository {
     const result = await query(
       `UPDATE users
         SET name = COALESCE($1, name),
-            username = COALESCE($2, username)
-            WHERE id = $3`,
-      [user.name, user.username, id],
+            username = COALESCE($2, username),
+            password = COALESCE($3, password)
+            WHERE id = $4
+        RETURNING id, name, username`,
+      [user.name, user.username, user.password, id],
     );
 
     return result.rows[0] || null;

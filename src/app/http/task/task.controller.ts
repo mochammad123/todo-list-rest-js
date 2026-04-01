@@ -17,8 +17,8 @@ const getTasks = async (req: Request, res: Response, next: NextFunction) => {
 
 const createTask = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id: userId } = req.params;
     const data = createTaskSchema.parse(req.body);
+    const userId = req.user?.userId;
 
     const repoUser = new UserRepository();
     const repoTask = new TaskRepository();
@@ -37,8 +37,9 @@ const createTask = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateTask = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id: userId } = req.params;
+    const { id } = req.params;
     const data = updateTaskSchema.parse(req.body);
+    const userId = req.user?.userId;
 
     const repoUser = new UserRepository();
     const repoTask = new TaskRepository();
@@ -46,10 +47,10 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
     const user = await repoUser.findById(Number(userId));
     if (!user) return response(res, 404, "User tidak ditemukan");
 
-    const task = await repoTask.findById(data.id);
+    const task = await repoTask.findById(Number(id));
     if (!task) return response(res, 404, "Task tidak ditemukan");
 
-    const updatedTask = await repoTask.update(Number(userId), data);
+    const updatedTask = await repoTask.update(Number(id), Number(userId), data);
     if (!updatedTask) return response(res, 500, "Gagal memperbarui task");
 
     return response(res, 200, "Berhasil memperbarui task", updatedTask);
@@ -60,7 +61,8 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { id, userId } = req.params;
+    const { id } = req.params;
+    const userId = req.user?.userId;
 
     const repoUser = new UserRepository();
     const repoTask = new TaskRepository();

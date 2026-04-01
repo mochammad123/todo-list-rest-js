@@ -6,7 +6,6 @@ export const createTaskSchema = z.object({
 });
 
 export const updateTaskSchema = z.object({
-  id: z.number(),
   title: z.string().min(2).max(100).optional(),
   description: z.string().min(5).max(500).optional(),
 });

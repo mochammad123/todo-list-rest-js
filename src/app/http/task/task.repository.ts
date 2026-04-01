@@ -24,11 +24,20 @@ export default class TaskRepository {
 
   async getAll(): Promise<ITask.ResponseTask[]> {
     const result = await query(
-      `SELECT t.id, t.title, t.description, t.user_id, u.name, u.username
+      `SELECT t.id, t.title, t.description, u.id as user_id, u.name, u.username
         FROM tasks t
         LEFT JOIN users u ON t.user_id = u.id`,
     );
-    return result.rows;
+    return result.rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      user: {
+        id: row.user_id,
+        name: row.name,
+        username: row.username,
+      },
+    }));
   }
 
   async create(
@@ -38,13 +47,14 @@ export default class TaskRepository {
     const result = await query(
       `INSERT INTO tasks(title, description, user_id)
         VALUES ($1, $2, $3)
-        RETURNING id, title, description, user_id`,
+        RETURNING id, title, description`,
       [task.title, task.description, userId],
     );
     return result.rows[0];
   }
 
   async update(
+    id: number,
     userId: number,
     task: ITask.UpdateTask,
   ): Promise<ITask.ResponseTask | null> {
@@ -53,8 +63,8 @@ export default class TaskRepository {
         SET title = COALESCE($1, title),
             description = COALESCE($2, description)
         WHERE id = $3 AND user_id = $4
-        RETURNING id, title, description, user_id`,
-      [task.title, task.description, task.id, userId],
+        RETURNING id, title, description`,
+      [task.title, task.description, id, userId],
     );
     return result.rows[0] || null;
   }

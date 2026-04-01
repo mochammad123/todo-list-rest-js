@@ -3,7 +3,11 @@ declare namespace ITask {
     id: number;
     title: string;
     description: string;
-    user_id: number;
+    user?: {
+      id: number;
+      name: string;
+      username: string;
+    };
   }
 
   interface CreateTask {
@@ -12,7 +16,6 @@ declare namespace ITask {
   }
 
   interface UpdateTask {
-    id: number;
     title?: string;
     description?: string;
   }

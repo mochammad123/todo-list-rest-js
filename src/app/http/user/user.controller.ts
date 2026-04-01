@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import UserRepository from "./user.repository";
 import { response } from "../../../libs/http/response";
 import { createUserSchema, updateUserSchema } from "./user.request";
+import bcrypt from "bcryptjs";
 
 const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -28,7 +29,9 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const existingUser = await repository.findByUsername(data.username);
     if (existingUser) return response(res, 400, "Username sudah digunakan");
 
-    const user = await repository.create(data);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+
+    const user = await repository.create({ ...data, password: hashedPassword });
     if (!user) return response(res, 500, "Gagal membuat user");
 
     return response(res, 201, "Berhasil membuat user", user);
@@ -49,7 +52,14 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
     const existingUser = await repository.findById(Number(id));
     if (!existingUser) return response(res, 404, "User tidak ditemukan");
 
-    const user = await repository.update(Number(id), data);
+    const hashedPassword = data.password
+      ? await bcrypt.hash(data.password, 10)
+      : undefined;
+
+    const user = await repository.update(Number(id), {
+      ...data,
+      password: hashedPassword,
+    });
     if (!user) return response(res, 500, "Gagal memperbarui user");
 
     return response(res, 200, "Berhasil memperbarui user", user);

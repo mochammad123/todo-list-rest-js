@@ -4,6 +4,17 @@ import { response } from "../../../libs/http/response";
 import { createUserSchema, updateUserSchema } from "./user.request";
 import bcrypt from "bcryptjs";
 
+const getUsers = async (_req: Request, res: Response, next: NextFunction) => {
+  try {
+    const repository = new UserRepository();
+    const users = await repository.getAll();
+
+    return response(res, 200, "Berhasil mendapatkan data user", users);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
@@ -85,6 +96,7 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export default {
+  getUsers,
   getMe,
   createUser,
   updateUser,

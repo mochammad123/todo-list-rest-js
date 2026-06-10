@@ -1,6 +1,12 @@
 import { query } from "../../../libs/config/database";
 
 export default class UserRepository {
+  async getAll(): Promise<IUser.ResponseUser[]> {
+    const result = await query(`SELECT id, name, username FROM users ORDER BY id ASC`);
+
+    return result.rows;
+  }
+
   async findById(id: number): Promise<IUser.ResponseUser | null> {
     const result = await query(
       `SELECT id, name, username FROM users WHERE id = $1`,

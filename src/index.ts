@@ -20,7 +20,7 @@ export const createApp = (): Express => {
   });
 
   app.use(limiter);
-  app.use("/api", routes);
+  app.use(routes);
   app.use(errorMiddleware);
 
   return app;

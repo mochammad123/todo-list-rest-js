@@ -41,7 +41,7 @@ services:
 
   frontend:
     build:
-      context: ../todo-list-react
+      context: ../todo-list-web
     container_name: todo-frontend
     restart: unless-stopped
     environment:

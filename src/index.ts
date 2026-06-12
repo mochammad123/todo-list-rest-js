@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import { errorMiddleware } from "./libs/middlewares/error.middleware";
 import { env } from "./libs/config/env";
 import routes from "./app/routes";
+import { connectRedis } from "./libs/config/redis";
 
 export const createApp = (): Express => {
   const app = express();
@@ -26,7 +27,16 @@ export const createApp = (): Express => {
   return app;
 };
 
-const app = createApp();
-app.listen(env.PORT, () => {
-  console.log(`Server is running on port ${env.PORT}`);
+const start = async () => {
+  await connectRedis();
+
+  const app = createApp();
+  app.listen(env.PORT, () => {
+    console.log(`Server is running on port ${env.PORT}`);
+  });
+};
+
+start().catch((error) => {
+  console.error("Failed to start server:", error);
+  process.exit(1);
 });

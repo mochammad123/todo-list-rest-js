@@ -6,6 +6,8 @@ import { errorMiddleware } from "./libs/middlewares/error.middleware";
 import { env } from "./libs/config/env";
 import routes from "./app/routes";
 import { connectRedis } from "./libs/config/redis";
+import { connectRabbitMQ } from "./libs/config/rabbitmq";
+import { startUserRegisteredWorker } from "./libs/workers/user-registered.worker";
 
 export const createApp = (): Express => {
   const app = express();
@@ -29,6 +31,8 @@ export const createApp = (): Express => {
 
 const start = async () => {
   await connectRedis();
+  await connectRabbitMQ();
+  await startUserRegisteredWorker();
 
   const app = createApp();
   app.listen(env.PORT, () => {

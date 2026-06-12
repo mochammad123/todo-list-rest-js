@@ -36,6 +36,10 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_TTL_SECONDS: ${REDIS_TTL_SECONDS:-60}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
       # REDIS_HOST: ${REDIS_HOST:-host.docker.internal}
       # REDIS_PORT: ${REDIS_PORT:-6379}
     ports:

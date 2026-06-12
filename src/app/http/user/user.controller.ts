@@ -40,6 +40,9 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const existingUser = await repository.findByUsername(data.username);
     if (existingUser) return response(res, 400, "Username sudah digunakan");
 
+    const existingEmail = await repository.findByEmail(data.email);
+    if (existingEmail) return response(res, 400, "Email sudah digunakan");
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const user = await repository.create({ ...data, password: hashedPassword });

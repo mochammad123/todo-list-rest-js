@@ -16,6 +16,10 @@ const envSchema = z.object({
   REDIS_HOST: z.string().default("127.0.0.1"),
   REDIS_PORT: z.string().transform(Number).default(6379),
   REDIS_TTL_SECONDS: z.string().transform(Number).default(60),
+  RABBITMQ_HOST: z.string().default("localhost"),
+  RABBITMQ_PORT: z.string().transform(Number).default(5672),
+  RABBITMQ_USER: z.string().default("guest"),
+  RABBITMQ_PASSWORD: z.string().default("guest"),
 });
 
 export const env = envSchema.parse(process.env);

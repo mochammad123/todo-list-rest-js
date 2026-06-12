@@ -4,7 +4,7 @@ import { query } from "../../../libs/config/database";
 export default class AuthRepository {
   async findById(id: number): Promise<IAuth.ResponseUser | null> {
     const result = await query(
-      `SELECT id, name, username, password
+      `SELECT id, name, username, email, password
             FROM users
             WHERE id = $1 LIMIT 1`,
       [id],
@@ -15,7 +15,7 @@ export default class AuthRepository {
 
   async findByUsername(username: string): Promise<IAuth.ResponseUser | null> {
     const result = await query(
-      `SELECT id, username, password
+      `SELECT id, name, username, email, password
             FROM users
             WHERE username = $1 LIMIT 1`,
       [username],
@@ -24,12 +24,23 @@ export default class AuthRepository {
     return result.rows[0] || null;
   }
 
-  async create(user: IAuth.RequestRegister): Promise<IAuth.ResponseUser> {
+  async findByEmail(email: string): Promise<IAuth.ResponseUser | null> {
     const result = await query(
-      `INSERT INTO users (name, username, password)
-        VALUES($1, $2, $3)
-        RETURNING id, name, username`,
-      [user.name, user.username, user.password],
+      `SELECT id, name, username, email, password
+            FROM users
+            WHERE email = $1 LIMIT 1`,
+      [email],
+    );
+
+    return result.rows[0] || null;
+  }
+
+  async create(user: IAuth.RequestRegister): Promise<IAuth.ResponseRegister> {
+    const result = await query(
+      `INSERT INTO users (name, username, email, password)
+        VALUES($1, $2, $3, $4)
+        RETURNING id, name, username, email`,
+      [user.name, user.username, user.email, user.password],
     );
 
     return result.rows[0];

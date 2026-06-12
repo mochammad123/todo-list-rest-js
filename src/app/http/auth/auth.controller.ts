@@ -4,6 +4,7 @@ import AuthRepository from "./auth.repository";
 import { response } from "../../../libs/http/response";
 import { generateToken } from "../../../libs/helpers/jwt.helper";
 import bcrypt from "bcryptjs";
+import { publishToQueue, QUEUES } from "../../../libs/helpers/queue.helper";
 
 const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -18,11 +19,26 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
         "Username sudah digunakan, silahkan gunakan username lain",
       );
 
+    const existingEmail = await repository.findByEmail(data.email);
+    if (existingEmail)
+      return response(
+        res,
+        400,
+        "Email sudah digunakan, silahkan gunakan email lain",
+      );
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const user = await repository.create({ ...data, password: hashedPassword });
     if (!user)
       return response(res, 500, "Gagal membuat user, silahkan coba lagi");
+
+    await publishToQueue(QUEUES.USER_REGISTERED, {
+      userId: user.id,
+      username: user.username,
+      name: user.name,
+      email: user.email,
+    });
 
     return response(res, 201, "Berhasil membuat user", user);
   } catch (error) {

@@ -3,17 +3,20 @@ declare namespace IUser {
     id: number;
     name: string;
     username: string;
+    email: string;
   }
 
   interface CreateUser {
     name: string;
     username: string;
+    email: string;
     password: string;
   }
 
   interface UpdateUser {
     name?: string;
     username?: string;
+    email?: string;
     password?: string;
   }
 }

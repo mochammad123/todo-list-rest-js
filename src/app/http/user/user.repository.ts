@@ -2,14 +2,16 @@ import { query } from "../../../libs/config/database";
 
 export default class UserRepository {
   async getAll(): Promise<IUser.ResponseUser[]> {
-    const result = await query(`SELECT id, name, username FROM users ORDER BY id ASC`);
+    const result = await query(
+      `SELECT id, name, username, email FROM users ORDER BY id ASC`,
+    );
 
     return result.rows;
   }
 
   async findById(id: number): Promise<IUser.ResponseUser | null> {
     const result = await query(
-      `SELECT id, name, username FROM users WHERE id = $1`,
+      `SELECT id, name, username, email FROM users WHERE id = $1`,
       [id],
     );
 
@@ -18,8 +20,17 @@ export default class UserRepository {
 
   async findByUsername(username: string): Promise<IUser.ResponseUser | null> {
     const result = await query(
-      `SELECT id, name, username FROM users WHERE username = $1`,
+      `SELECT id, name, username, email FROM users WHERE username = $1`,
       [username],
+    );
+
+    return result.rows[0] || null;
+  }
+
+  async findByEmail(email: string): Promise<IUser.ResponseUser | null> {
+    const result = await query(
+      `SELECT id, name, username, email FROM users WHERE email = $1`,
+      [email],
     );
 
     return result.rows[0] || null;
@@ -27,10 +38,10 @@ export default class UserRepository {
 
   async create(user: IUser.CreateUser): Promise<IUser.ResponseUser> {
     const result = await query(
-      `INSERT INTO users(name, username, password) 
-      VALUES ($1, $2, $3) 
-      RETURNING id, name, username`,
-      [user.name, user.username, user.password],
+      `INSERT INTO users(name, username, email, password)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, name, username, email`,
+      [user.name, user.username, user.email, user.password],
     );
 
     return result.rows[0];
@@ -44,10 +55,11 @@ export default class UserRepository {
       `UPDATE users
         SET name = COALESCE($1, name),
             username = COALESCE($2, username),
-            password = COALESCE($3, password)
-            WHERE id = $4
-        RETURNING id, name, username`,
-      [user.name, user.username, user.password, id],
+            email = COALESCE($3, email),
+            password = COALESCE($4, password)
+            WHERE id = $5
+        RETURNING id, name, username, email`,
+      [user.name, user.username, user.email, user.password, id],
     );
 
     return result.rows[0] || null;
